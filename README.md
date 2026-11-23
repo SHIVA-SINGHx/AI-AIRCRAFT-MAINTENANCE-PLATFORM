@@ -177,6 +177,7 @@ AI-AIRCRAFT-MAINTENANCE-PLATFORM/
 |   `-- workflows/
 |       `-- deploy.yml             # Main GitHub Actions CI/CD pipeline
 |
+|-- docker-compose.yml             # Local frontend + backend orchestration
 |-- backend/
 |   |-- app.py                     # FastAPI endpoints
 |   |-- dockerfile                 # Backend container definition
@@ -319,7 +320,19 @@ npm run dev
 
 By default, Vite serves the frontend on `http://localhost:5173`.
 
-Update the backend URL in `frontend/src/api/client.js` for a local or remote API. The current implementation contains a deployed backend URL and is not currently reading `VITE_API_BASE_URL` at runtime.
+The API client reads `VITE_API_BASE_URL`; it defaults to `http://localhost:8000`. Set this variable when using a different backend.
+
+### Run the Full Stack with Docker Compose
+
+From the repository root, optionally provide AWS credentials in your shell or a root `.env` file (do not commit credentials), then run:
+
+```bash
+docker compose up --build
+```
+
+Open the frontend at `http://localhost:5173` and the API docs at `http://localhost:8000/docs`. To stop the containers, press `Ctrl+C`, then run `docker compose down`.
+
+The Compose setup starts both services, maps their ports to the host, points the frontend at the host-accessible backend URL, and passes AWS settings to the backend for Bedrock requests. Excel analytics and the health endpoint can run without AWS credentials; Bedrock-backed recommendations require valid AWS credentials and model access.
 
 ---
 
@@ -399,6 +412,8 @@ The response contains a `success` flag and a structured `report` object.
 ---
 
 ## Docker Containerization
+
+The root `docker-compose.yml` runs the frontend and backend together for local development.
 
 ### Build Images Locally
 
